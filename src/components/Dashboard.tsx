@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { Search, Bell, ArrowUp, ArrowDown } from "lucide-react";
+import { Search, Bell } from "lucide-react";
 import KpiCard from "@/components/KpiCard";
 import ConversionFunnel from "@/components/charts/ConversionFunnel";
 import CartsValueChart from "@/components/charts/CartsValueChart";
@@ -87,32 +87,32 @@ const Dashboard = () => {
   const cityOptions = ["Tous", ...new Set(mockEcommerceData.map(item => item.city))];
 
   return (
-    <div className="flex-1 overflow-y-auto">
-      <div className="p-6">
+    <div className="flex-1 overflow-y-auto bg-gray-50">
+      <div className="p-4 lg:p-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-semibold">
+          <h1 className="text-xl lg:text-2xl font-semibold text-gray-800">
             Optimisation des ventes - Conversion & abandon de panier
           </h1>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
               <input 
                 type="text" 
                 placeholder="Rechercher..." 
-                className="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400"
+                className="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-400 bg-white"
               />
             </div>
-            <button className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200">
-              <Bell size={20} />
+            <button className="p-2 rounded-lg hover:bg-violet-50 transition-colors">
+              <Bell size={20} className="text-gray-600" />
             </button>
           </div>
         </div>
 
         {/* Filters */}
-        <div className="flex gap-4 mb-6">
+        <div className="flex flex-wrap gap-3 mb-6">
           <select 
-            className="border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
+            className="border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-violet-400 bg-white hover:border-violet-300 transition-colors"
             value={filters.year}
             onChange={(e) => setFilters({...filters, year: e.target.value})}
           >
@@ -122,7 +122,7 @@ const Dashboard = () => {
           </select>
           
           <select 
-            className="border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
+            className="border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-violet-400 bg-white hover:border-violet-300 transition-colors"
             value={filters.month}
             onChange={(e) => setFilters({...filters, month: e.target.value})}
           >
@@ -134,7 +134,7 @@ const Dashboard = () => {
           </select>
           
           <select 
-            className="border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
+            className="border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-violet-400 bg-white hover:border-violet-300 transition-colors"
             value={filters.product}
             onChange={(e) => setFilters({...filters, product: e.target.value})}
           >
@@ -146,7 +146,7 @@ const Dashboard = () => {
           </select>
           
           <select 
-            className="border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
+            className="border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-violet-400 bg-white hover:border-violet-300 transition-colors"
             value={filters.city}
             onChange={(e) => setFilters({...filters, city: e.target.value})}
           >
@@ -159,14 +159,14 @@ const Dashboard = () => {
         </div>
 
         {/* KPI Cards */}
-        <div className="grid grid-cols-5 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
           <KpiCard 
             icon="%"
             title="Taux de conversion"
             value={`${conversionRate} %`}
             change={+2.5}
-            iconBg="bg-indigo-100"
-            iconColor="text-indigo-600"
+            iconBg="bg-violet-100"
+            iconColor="text-violet-600"
           />
           
           <KpiCard 
@@ -174,8 +174,8 @@ const Dashboard = () => {
             title="Panier moyen"
             value={`€ ${averageCartValue}`}
             change={+12}
-            iconBg="bg-green-100"
-            iconColor="text-green-600"
+            iconBg="bg-emerald-100"
+            iconColor="text-emerald-600"
           />
           
           <KpiCard 
@@ -193,23 +193,23 @@ const Dashboard = () => {
             title="Conversion après relance"
             value={`${recoveryRate} %`}
             change={+2.1}
-            iconBg="bg-green-100"
-            iconColor="text-green-600"
+            iconBg="bg-blue-100"
+            iconColor="text-blue-600"
           />
           
           <KpiCard 
             icon="💰"
             title="Potentiels de vente"
             value={`€ ${salesPotential}`}
-            iconBg="bg-blue-100"
-            iconColor="text-blue-600"
+            iconBg="bg-amber-100"
+            iconColor="text-amber-600"
           />
         </div>
 
         {/* Charts - Row 1 */}
-        <div className="grid grid-cols-3 gap-6 mb-8">
-          <div className="border rounded-lg p-4 bg-white">
-            <h3 className="text-lg font-medium mb-4">Taux de conversion à chaque étape</h3>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+          <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 hover:shadow-lg transition-shadow">
+            <h3 className="text-lg font-medium mb-4 text-gray-800">Taux de conversion à chaque étape</h3>
             <ConversionFunnel 
               totalVisits={totalVisits} 
               cartsCreated={totalCarts} 
@@ -217,41 +217,41 @@ const Dashboard = () => {
             />
           </div>
           
-          <div className="border rounded-lg p-4 bg-white">
-            <h3 className="text-lg font-medium mb-4">Valeur des paniers abandonnés VS récupérés</h3>
+          <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 hover:shadow-lg transition-shadow">
+            <h3 className="text-lg font-medium mb-4 text-gray-800">Valeur des paniers abandonnés VS récupérés</h3>
             <CartsValueChart 
               abandonedValue={totalAbandonedValue} 
               recoveredValue={totalConfirmedValue} 
             />
           </div>
           
-          <div className="border rounded-lg p-4 bg-white">
-            <h3 className="text-lg font-medium mb-4">Taux d'abandon par type de client</h3>
+          <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 hover:shadow-lg transition-shadow">
+            <h3 className="text-lg font-medium mb-4 text-gray-800">Taux d'abandon par type de client</h3>
             <ClientTypeChart data={filteredData} />
           </div>
         </div>
 
         {/* Charts - Row 2 */}
-        <div className="grid grid-cols-3 gap-6 mb-8">
-          <div className="border rounded-lg p-4 bg-white">
-            <h3 className="text-lg font-medium mb-4">Évolution du taux d'abandon</h3>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+          <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 hover:shadow-lg transition-shadow">
+            <h3 className="text-lg font-medium mb-4 text-gray-800">Évolution du taux d'abandon</h3>
             <AbandonRateChart data={filteredData} />
           </div>
           
-          <div className="border rounded-lg p-4 bg-white">
-            <h3 className="text-lg font-medium mb-4">Taux d'abandon par appareil</h3>
+          <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 hover:shadow-lg transition-shadow">
+            <h3 className="text-lg font-medium mb-4 text-gray-800">Taux d'abandon par appareil</h3>
             <DeviceAbandonChart data={filteredData} />
           </div>
           
-          <div className="border rounded-lg p-4 bg-white">
-            <h3 className="text-lg font-medium mb-4">Taux d'abandon par canal</h3>
+          <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 hover:shadow-lg transition-shadow">
+            <h3 className="text-lg font-medium mb-4 text-gray-800">Taux d'abandon par canal</h3>
             <ChannelAbandonChart data={filteredData} />
           </div>
         </div>
 
         {/* Products Table */}
-        <div className="border rounded-lg p-4 bg-white mb-8">
-          <h3 className="text-lg font-medium mb-4">Tableau complet des produits</h3>
+        <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 hover:shadow-lg transition-shadow">
+          <h3 className="text-lg font-medium mb-4 text-gray-800">Tableau complet des produits</h3>
           <ProductsTable data={filteredData} />
         </div>
       </div>
