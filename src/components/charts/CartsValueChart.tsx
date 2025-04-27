@@ -1,5 +1,4 @@
 
-import { useEffect, useRef } from 'react';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -23,9 +22,13 @@ ChartJS.register(
 interface CartsValueChartProps {
   abandonedValue: number;
   recoveredValue: number;
+  onStatusClick?: (status: string) => void;
+  activeStatus?: string;
 }
 
-const CartsValueChart = ({ abandonedValue, recoveredValue }: CartsValueChartProps) => {
+const CartsValueChart = ({ abandonedValue, recoveredValue, onStatusClick, activeStatus }: CartsValueChartProps) => {
+  const statuses = ['Abandonné', 'Panier récupéré'];
+  
   const data = {
     labels: ['Paniers abandonnés', 'Paniers récupérés'],
     datasets: [
@@ -33,12 +36,12 @@ const CartsValueChart = ({ abandonedValue, recoveredValue }: CartsValueChartProp
         label: 'Valeur (€)',
         data: [abandonedValue, recoveredValue],
         backgroundColor: [
-          'rgba(255, 99, 132, 0.6)',
-          'rgba(75, 192, 192, 0.6)',
+          activeStatus === 'Abandonné' ? 'rgba(234, 56, 76, 0.9)' : 'rgba(255, 99, 132, 0.6)',
+          activeStatus === 'Panier récupéré' ? 'rgba(75, 250, 192, 0.9)' : 'rgba(75, 192, 192, 0.6)'
         ],
         borderColor: [
-          'rgb(255, 99, 132)',
-          'rgb(75, 192, 192)',
+          activeStatus === 'Abandonné' ? 'rgb(234, 56, 76)' : 'rgb(255, 99, 132)',
+          activeStatus === 'Panier récupéré' ? 'rgb(75, 250, 192)' : 'rgb(75, 192, 192)'
         ],
         borderWidth: 1,
       },
@@ -74,6 +77,13 @@ const CartsValueChart = ({ abandonedValue, recoveredValue }: CartsValueChartProp
             return label;
           }
         }
+      }
+    },
+    onClick: (event: any, elements: any[]) => {
+      if (elements.length > 0 && onStatusClick) {
+        const index = elements[0].index;
+        const status = statuses[index];
+        onStatusClick(status);
       }
     }
   };

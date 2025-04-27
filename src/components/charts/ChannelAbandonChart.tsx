@@ -1,3 +1,4 @@
+
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -21,9 +22,10 @@ ChartJS.register(
 interface ChannelAbandonChartProps {
   data: any[];
   onChannelClick?: (channel: string) => void;
+  activeChannel?: string;
 }
 
-const ChannelAbandonChart = ({ data, onChannelClick }: ChannelAbandonChartProps) => {
+const ChannelAbandonChart = ({ data, onChannelClick, activeChannel }: ChannelAbandonChartProps) => {
   const calculateData = () => {
     const channels = ["Email", "SEO", "Publicité payante", "Accès direct", "Réseaux sociaux"];
     const channelData = [];
@@ -55,20 +57,16 @@ const ChannelAbandonChart = ({ data, onChannelClick }: ChannelAbandonChartProps)
       {
         label: "Taux d'abandon (%)",
         data: channelData.map(item => item.rate),
-        backgroundColor: [
-          'rgba(153, 102, 255, 0.6)',
-          'rgba(153, 102, 255, 0.5)',
-          'rgba(153, 102, 255, 0.4)',
-          'rgba(153, 102, 255, 0.3)',
-          'rgba(153, 102, 255, 0.2)',
-        ],
-        borderColor: [
-          'rgb(153, 102, 255)',
-          'rgb(153, 102, 255)',
-          'rgb(153, 102, 255)',
-          'rgb(153, 102, 255)',
-          'rgb(153, 102, 255)',
-        ],
+        backgroundColor: channelData.map(item => 
+          item.channel === activeChannel 
+            ? 'rgba(139, 92, 246, 0.9)' 
+            : 'rgba(153, 102, 255, 0.6)'
+        ),
+        borderColor: channelData.map(item => 
+          item.channel === activeChannel 
+            ? 'rgb(139, 92, 246)' 
+            : 'rgb(153, 102, 255)'
+        ),
         borderWidth: 1
       }
     ]

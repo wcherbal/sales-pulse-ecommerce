@@ -1,3 +1,4 @@
+
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -21,9 +22,10 @@ ChartJS.register(
 interface DeviceAbandonChartProps {
   data: any[];
   onDeviceClick?: (device: string) => void;
+  activeDevice?: string;
 }
 
-const DeviceAbandonChart = ({ data, onDeviceClick }: DeviceAbandonChartProps) => {
+const DeviceAbandonChart = ({ data, onDeviceClick, activeDevice }: DeviceAbandonChartProps) => {
   const calculateData = () => {
     const deviceTypes = ["Mobile", "Desktop", "Tablette"];
     const rates = [];
@@ -43,23 +45,24 @@ const DeviceAbandonChart = ({ data, onDeviceClick }: DeviceAbandonChartProps) =>
   };
 
   const rates = calculateData();
+  const deviceTypes = ["Mobile", "Desktop", "Tablette"];
   
   const chartData = {
-    labels: ['Mobile', 'Desktop', 'Tablette'],
+    labels: deviceTypes,
     datasets: [
       {
         label: "Taux d'abandon (%)",
         data: rates,
-        backgroundColor: [
-          'rgba(255, 159, 64, 0.6)',
-          'rgba(54, 162, 235, 0.6)',
-          'rgba(153, 102, 255, 0.6)',
-        ],
-        borderColor: [
-          'rgb(255, 159, 64)',
-          'rgb(54, 162, 235)',
-          'rgb(153, 102, 255)',
-        ],
+        backgroundColor: deviceTypes.map(device => 
+          device === activeDevice 
+            ? 'rgba(139, 92, 246, 0.9)' 
+            : 'rgba(255, 159, 64, 0.6)'
+        ),
+        borderColor: deviceTypes.map(device => 
+          device === activeDevice 
+            ? 'rgb(139, 92, 246)' 
+            : 'rgb(255, 159, 64)'
+        ),
         borderWidth: 1
       }
     ]
@@ -96,13 +99,13 @@ const DeviceAbandonChart = ({ data, onDeviceClick }: DeviceAbandonChartProps) =>
             return label;
           }
         }
-      },
-      onClick: (event: any, elements: any[]) => {
-        if (elements.length > 0 && onDeviceClick) {
-          const index = elements[0].index;
-          const deviceType = ['Mobile', 'Desktop', 'Tablette'][index];
-          onDeviceClick(deviceType);
-        }
+      }
+    },
+    onClick: (event: any, elements: any[]) => {
+      if (elements.length > 0 && onDeviceClick) {
+        const index = elements[0].index;
+        const deviceType = deviceTypes[index];
+        onDeviceClick(deviceType);
       }
     }
   };

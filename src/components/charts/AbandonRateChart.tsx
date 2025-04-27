@@ -23,9 +23,11 @@ ChartJS.register(
 
 interface AbandonRateChartProps {
   data: any[];
+  onMonthClick?: (month: number) => void;
+  activeMonth?: number;
 }
 
-const AbandonRateChart = ({ data }: AbandonRateChartProps) => {
+const AbandonRateChart = ({ data, onMonthClick, activeMonth }: AbandonRateChartProps) => {
   // Group data by month and calculate abandonment rate
   const calculateMonthlyRates = () => {
     const monthlyData: Record<number, { abandoned: number, recovered: number }> = {};
@@ -59,6 +61,7 @@ const AbandonRateChart = ({ data }: AbandonRateChartProps) => {
       
       rates.push({
         month: monthNames[i-1],
+        monthNumber: i,
         rate: Math.round(rate)
       });
     }
@@ -74,12 +77,28 @@ const AbandonRateChart = ({ data }: AbandonRateChartProps) => {
       {
         label: "Taux d'abandon (%)",
         data: monthlyRates.map(item => item.rate),
-        borderColor: 'rgb(102, 51, 153)',
-        backgroundColor: 'rgba(102, 51, 153, 0.5)',
-        pointBackgroundColor: 'rgb(102, 51, 153)',
-        pointBorderColor: '#fff',
-        pointBorderWidth: 2,
-        pointRadius: 4,
+        borderColor: 'rgb(139, 92, 246)',
+        backgroundColor: 'rgba(139, 92, 246, 0.5)',
+        pointBackgroundColor: monthlyRates.map(item => 
+          item.monthNumber === activeMonth 
+            ? 'rgb(234, 56, 76)' 
+            : 'rgb(139, 92, 246)'
+        ),
+        pointBorderColor: monthlyRates.map(item => 
+          item.monthNumber === activeMonth 
+            ? '#fff' 
+            : '#fff'
+        ),
+        pointBorderWidth: monthlyRates.map(item => 
+          item.monthNumber === activeMonth 
+            ? 3 
+            : 2
+        ),
+        pointRadius: monthlyRates.map(item => 
+          item.monthNumber === activeMonth 
+            ? 6 
+            : 4
+        ),
         tension: 0.3,
       }
     ]
@@ -123,6 +142,13 @@ const AbandonRateChart = ({ data }: AbandonRateChartProps) => {
             return label;
           }
         }
+      }
+    },
+    onClick: (event: any, elements: any[]) => {
+      if (elements.length > 0 && onMonthClick) {
+        const index = elements[0].index;
+        const monthNumber = monthlyRates[index].monthNumber;
+        onMonthClick(monthNumber);
       }
     }
   };

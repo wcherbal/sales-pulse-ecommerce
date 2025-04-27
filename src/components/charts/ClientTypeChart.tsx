@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -22,9 +22,10 @@ ChartJS.register(
 interface ClientTypeChartProps {
   data: any[];
   onClientTypeClick?: (type: string) => void;
+  activeClientType?: string;
 }
 
-const ClientTypeChart = ({ data, onClientTypeClick }: ClientTypeChartProps) => {
+const ClientTypeChart = ({ data, onClientTypeClick, activeClientType }: ClientTypeChartProps) => {
   // Group data by client type
   const calculateData = () => {
     const newVisitors = data.filter(item => item.clientType === "Nouveau visiteur");
@@ -50,15 +51,24 @@ const ClientTypeChart = ({ data, onClientTypeClick }: ClientTypeChartProps) => {
   };
 
   const rates = calculateData();
+  const clientTypes = ['Nouveau visiteur', 'Client récurrent'];
   
   const chartData = {
-    labels: ['Nouveaux visiteurs', 'Clients récurrents'],
+    labels: clientTypes,
     datasets: [
       {
         label: "Taux d'abandon (%)",
         data: rates,
-        backgroundColor: ['rgba(110, 64, 170, 0.6)', 'rgba(65, 84, 180, 0.6)'],
-        borderColor: ['rgb(110, 64, 170)', 'rgb(65, 84, 180)'],
+        backgroundColor: clientTypes.map(type => 
+          type === activeClientType 
+            ? 'rgba(139, 92, 246, 0.9)' 
+            : 'rgba(110, 64, 170, 0.6)'
+        ),
+        borderColor: clientTypes.map(type => 
+          type === activeClientType 
+            ? 'rgb(139, 92, 246)' 
+            : 'rgb(110, 64, 170)'
+        ),
         borderWidth: 1
       }
     ]
@@ -99,7 +109,7 @@ const ClientTypeChart = ({ data, onClientTypeClick }: ClientTypeChartProps) => {
     onClick: (event: any, elements: any[]) => {
       if (elements.length > 0 && onClientTypeClick) {
         const index = elements[0].index;
-        const clientType = ['Nouveau visiteur', 'Client récurrent'][index];
+        const clientType = clientTypes[index];
         onClientTypeClick(clientType);
       }
     }

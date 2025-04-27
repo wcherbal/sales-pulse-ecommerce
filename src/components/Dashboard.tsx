@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Search, Bell } from "lucide-react";
 import KpiCard from "@/components/KpiCard";
@@ -9,6 +10,7 @@ import DeviceAbandonChart from "@/components/charts/DeviceAbandonChart";
 import ChannelAbandonChart from "@/components/charts/ChannelAbandonChart";
 import ProductsTable from "@/components/ProductsTable";
 import { mockEcommerceData } from "@/data/mockData";
+import { toast } from "@/components/ui/use-toast";
 
 interface DynamicFilters {
   year: string;
@@ -18,6 +20,9 @@ interface DynamicFilters {
   deviceType?: string;
   clientType?: string;
   acquisitionChannel?: string;
+  status?: string;
+  funnelStage?: string;
+  selectedMonth?: number;
 }
 
 const Dashboard = () => {
@@ -33,14 +38,75 @@ const Dashboard = () => {
   useEffect(() => {
     let result = [...mockEcommerceData];
     
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value !== "Tous" && value !== undefined) {
-        result = result.filter(item => item[key as keyof typeof item] === value);
+    // Filter by standard dropdown filters
+    if (filters.year !== "Tous") {
+      result = result.filter(item => item.year === filters.year);
+    }
+    
+    if (filters.month !== "Tous") {
+      result = result.filter(item => item.month === Number(filters.month));
+    }
+    
+    if (filters.product !== "Tous") {
+      result = result.filter(item => item.product === filters.product);
+    }
+    
+    if (filters.city !== "Tous") {
+      result = result.filter(item => item.city === filters.city);
+    }
+    
+    // Filter by interactive chart filters
+    if (filters.deviceType) {
+      result = result.filter(item => item.deviceType === filters.deviceType);
+    }
+    
+    if (filters.clientType) {
+      result = result.filter(item => item.clientType === filters.clientType);
+    }
+    
+    if (filters.acquisitionChannel) {
+      result = result.filter(item => item.acquisitionChannel === filters.acquisitionChannel);
+    }
+    
+    if (filters.status) {
+      result = result.filter(item => item.status === filters.status);
+    }
+    
+    if (filters.funnelStage) {
+      if (filters.funnelStage === 'carts') {
+        result = result.filter(item => 
+          item.status === "Abandonné" || item.status === "Panier récupéré"
+        );
+      } else if (filters.funnelStage === 'purchases') {
+        result = result.filter(item => item.status === "Panier récupéré");
       }
-    });
+    }
+    
+    if (filters.selectedMonth) {
+      result = result.filter(item => item.month === filters.selectedMonth);
+    }
     
     setData(result);
   }, [filters]);
+
+  // Clear all interactive filters
+  const clearInteractiveFilters = () => {
+    setFilters(prev => ({
+      ...prev,
+      deviceType: undefined,
+      clientType: undefined,
+      acquisitionChannel: undefined,
+      status: undefined,
+      funnelStage: undefined,
+      selectedMonth: undefined
+    }));
+    
+    toast({
+      title: "Filtres interactifs réinitialisés",
+      description: "Tous les graphiques affichent maintenant les données complètes.",
+      duration: 3000,
+    });
+  };
 
   // Handle chart click events
   const handleDeviceClick = (device: string) => {
@@ -48,6 +114,14 @@ const Dashboard = () => {
       ...prev,
       deviceType: prev.deviceType === device ? undefined : device
     }));
+    
+    if (filters.deviceType !== device) {
+      toast({
+        title: `Filtre appliqué : ${device}`,
+        description: "Dashboard filtré par type d'appareil",
+        duration: 3000,
+      });
+    }
   };
 
   const handleClientTypeClick = (type: string) => {
@@ -55,6 +129,14 @@ const Dashboard = () => {
       ...prev,
       clientType: prev.clientType === type ? undefined : type
     }));
+    
+    if (filters.clientType !== type) {
+      toast({
+        title: `Filtre appliqué : ${type}`,
+        description: "Dashboard filtré par type de client",
+        duration: 3000,
+      });
+    }
   };
 
   const handleChannelClick = (channel: string) => {
@@ -62,6 +144,70 @@ const Dashboard = () => {
       ...prev,
       acquisitionChannel: prev.acquisitionChannel === channel ? undefined : channel
     }));
+    
+    if (filters.acquisitionChannel !== channel) {
+      toast({
+        title: `Filtre appliqué : ${channel}`,
+        description: "Dashboard filtré par canal d'acquisition",
+        duration: 3000,
+      });
+    }
+  };
+  
+  const handleStatusClick = (status: string) => {
+    setFilters(prev => ({
+      ...prev,
+      status: prev.status === status ? undefined : status
+    }));
+    
+    if (filters.status !== status) {
+      toast({
+        title: `Filtre appliqué : ${status === 'Abandonné' ? 'Paniers abandonnés' : 'Paniers récupérés'}`,
+        description: "Dashboard filtré par statut de panier",
+        duration: 3000,
+      });
+    }
+  };
+  
+  const handleFunnelStageClick = (stage: string) => {
+    setFilters(prev => ({
+      ...prev,
+      funnelStage: prev.funnelStage === stage ? undefined : stage
+    }));
+    
+    if (filters.funnelStage !== stage) {
+      const stageNames: Record<string, string> = {
+        'visits': 'Visites du site',
+        'carts': 'Paniers créés',
+        'purchases': 'Achats confirmés'
+      };
+      
+      toast({
+        title: `Filtre appliqué : ${stageNames[stage]}`,
+        description: "Dashboard filtré par étape du tunnel",
+        duration: 3000,
+      });
+    }
+  };
+  
+  const handleMonthClick = (month: number) => {
+    setFilters(prev => ({
+      ...prev,
+      selectedMonth: prev.selectedMonth === month ? undefined : month
+    }));
+    
+    if (filters.selectedMonth !== month) {
+      const monthNames = [
+        'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+        'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
+      ];
+      
+      toast({
+        title: `Filtre appliqué : ${monthNames[month-1]}`,
+        description: "Dashboard filtré par mois",
+        duration: 3000,
+      });
+    }
   };
 
   // Calculate KPI values from filtered data
@@ -96,7 +242,7 @@ const Dashboard = () => {
   // 5. Sales Potential from Abandoned Carts
   const abandonedItems = data.filter(item => item.status === "Abandonné");
   const totalAbandonedValue = abandonedItems.reduce((sum, item) => sum + item.price, 0);
-  const salesPotential = abandonedCarts > 0 ? 
+  const salesPotential = abandonedItems.length > 0 ? 
     (totalAbandonedValue).toFixed(0) : 0;
 
   // Filter options
@@ -110,9 +256,54 @@ const Dashboard = () => {
       <div className="p-4 lg:p-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-xl lg:text-2xl font-semibold text-gray-800">
-            Optimisation des ventes - Conversion & abandon de panier
-          </h1>
+          <div>
+            <h1 className="text-xl lg:text-2xl font-semibold text-gray-800">
+              Optimisation des ventes - Conversion & abandon de panier
+            </h1>
+            
+            {/* Active filters indicators */}
+            {(filters.deviceType || filters.clientType || filters.acquisitionChannel || filters.status || filters.funnelStage || filters.selectedMonth) && (
+              <div className="mt-2 flex flex-wrap gap-2">
+                {filters.deviceType && (
+                  <span className="bg-violet-100 text-violet-800 text-xs font-medium px-2.5 py-0.5 rounded">
+                    Appareil: {filters.deviceType}
+                  </span>
+                )}
+                {filters.clientType && (
+                  <span className="bg-violet-100 text-violet-800 text-xs font-medium px-2.5 py-0.5 rounded">
+                    Client: {filters.clientType}
+                  </span>
+                )}
+                {filters.acquisitionChannel && (
+                  <span className="bg-violet-100 text-violet-800 text-xs font-medium px-2.5 py-0.5 rounded">
+                    Canal: {filters.acquisitionChannel}
+                  </span>
+                )}
+                {filters.status && (
+                  <span className="bg-violet-100 text-violet-800 text-xs font-medium px-2.5 py-0.5 rounded">
+                    Statut: {filters.status}
+                  </span>
+                )}
+                {filters.funnelStage && (
+                  <span className="bg-violet-100 text-violet-800 text-xs font-medium px-2.5 py-0.5 rounded">
+                    Étape: {filters.funnelStage === 'visits' ? 'Visites' : filters.funnelStage === 'carts' ? 'Paniers' : 'Achats'}
+                  </span>
+                )}
+                {filters.selectedMonth && (
+                  <span className="bg-violet-100 text-violet-800 text-xs font-medium px-2.5 py-0.5 rounded">
+                    Mois: {filters.selectedMonth}
+                  </span>
+                )}
+                <button 
+                  onClick={clearInteractiveFilters}
+                  className="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded hover:bg-red-200"
+                >
+                  Effacer les filtres
+                </button>
+              </div>
+            )}
+          </div>
+          
           <div className="flex items-center gap-3">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
@@ -233,6 +424,8 @@ const Dashboard = () => {
               totalVisits={totalVisits} 
               cartsCreated={totalCarts} 
               confirmedPurchases={confirmedOrders}
+              onFunnelStageClick={handleFunnelStageClick}
+              activeStage={filters.funnelStage}
             />
           </div>
           
@@ -241,12 +434,18 @@ const Dashboard = () => {
             <CartsValueChart 
               abandonedValue={data.filter(item => item.status === "Abandonné").reduce((sum, item) => sum + item.price, 0)} 
               recoveredValue={data.filter(item => item.status === "Panier récupéré").reduce((sum, item) => sum + item.price, 0)} 
+              onStatusClick={handleStatusClick}
+              activeStatus={filters.status}
             />
           </div>
           
           <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 hover:shadow-lg transition-shadow">
             <h3 className="text-lg font-medium mb-4 text-gray-800">Taux d'abandon par type de client</h3>
-            <ClientTypeChart data={data} onClientTypeClick={handleClientTypeClick} />
+            <ClientTypeChart 
+              data={data} 
+              onClientTypeClick={handleClientTypeClick}
+              activeClientType={filters.clientType}
+            />
           </div>
         </div>
 
@@ -254,17 +453,29 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
           <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 hover:shadow-lg transition-shadow">
             <h3 className="text-lg font-medium mb-4 text-gray-800">Évolution du taux d'abandon</h3>
-            <AbandonRateChart data={data} />
+            <AbandonRateChart 
+              data={data} 
+              onMonthClick={handleMonthClick}
+              activeMonth={filters.selectedMonth}
+            />
           </div>
           
           <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 hover:shadow-lg transition-shadow">
             <h3 className="text-lg font-medium mb-4 text-gray-800">Taux d'abandon par appareil</h3>
-            <DeviceAbandonChart data={data} onDeviceClick={handleDeviceClick} />
+            <DeviceAbandonChart 
+              data={data} 
+              onDeviceClick={handleDeviceClick}
+              activeDevice={filters.deviceType}
+            />
           </div>
           
           <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 hover:shadow-lg transition-shadow">
             <h3 className="text-lg font-medium mb-4 text-gray-800">Taux d'abandon par canal</h3>
-            <ChannelAbandonChart data={data} onChannelClick={handleChannelClick} />
+            <ChannelAbandonChart 
+              data={data} 
+              onChannelClick={handleChannelClick}
+              activeChannel={filters.acquisitionChannel}
+            />
           </div>
         </div>
 
