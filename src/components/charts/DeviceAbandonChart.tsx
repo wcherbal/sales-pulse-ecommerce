@@ -1,4 +1,3 @@
-
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -21,10 +20,10 @@ ChartJS.register(
 
 interface DeviceAbandonChartProps {
   data: any[];
+  onDeviceClick?: (device: string) => void;
 }
 
-const DeviceAbandonChart = ({ data }: DeviceAbandonChartProps) => {
-  // Group data by device type
+const DeviceAbandonChart = ({ data, onDeviceClick }: DeviceAbandonChartProps) => {
   const calculateData = () => {
     const deviceTypes = ["Mobile", "Desktop", "Tablette"];
     const rates = [];
@@ -96,6 +95,13 @@ const DeviceAbandonChart = ({ data }: DeviceAbandonChartProps) => {
             }
             return label;
           }
+        }
+      },
+      onClick: (event: any, elements: any[]) => {
+        if (elements.length > 0 && onDeviceClick) {
+          const index = elements[0].index;
+          const deviceType = ['Mobile', 'Desktop', 'Tablette'][index];
+          onDeviceClick(deviceType);
         }
       }
     }

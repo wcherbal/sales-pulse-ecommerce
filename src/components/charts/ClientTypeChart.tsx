@@ -1,4 +1,3 @@
-
 import { useEffect, useRef } from 'react';
 import {
   Chart as ChartJS,
@@ -22,9 +21,10 @@ ChartJS.register(
 
 interface ClientTypeChartProps {
   data: any[];
+  onClientTypeClick?: (type: string) => void;
 }
 
-const ClientTypeChart = ({ data }: ClientTypeChartProps) => {
+const ClientTypeChart = ({ data, onClientTypeClick }: ClientTypeChartProps) => {
   // Group data by client type
   const calculateData = () => {
     const newVisitors = data.filter(item => item.clientType === "Nouveau visiteur");
@@ -94,6 +94,13 @@ const ClientTypeChart = ({ data }: ClientTypeChartProps) => {
       },
       legend: {
         display: false
+      }
+    },
+    onClick: (event: any, elements: any[]) => {
+      if (elements.length > 0 && onClientTypeClick) {
+        const index = elements[0].index;
+        const clientType = ['Nouveau visiteur', 'Client récurrent'][index];
+        onClientTypeClick(clientType);
       }
     }
   };

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Search, Bell } from "lucide-react";
 import KpiCard from "@/components/KpiCard";
@@ -11,51 +10,71 @@ import ChannelAbandonChart from "@/components/charts/ChannelAbandonChart";
 import ProductsTable from "@/components/ProductsTable";
 import { mockEcommerceData } from "@/data/mockData";
 
+interface DynamicFilters {
+  year: string;
+  month: string;
+  product: string;
+  city: string;
+  deviceType?: string;
+  clientType?: string;
+  acquisitionChannel?: string;
+}
+
 const Dashboard = () => {
   const [data, setData] = useState(mockEcommerceData);
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState<DynamicFilters>({
     year: "Tous",
     month: "Tous",
     product: "Tous",
     city: "Tous"
   });
-  const [filteredData, setFilteredData] = useState(mockEcommerceData);
   
   // Apply filters to data
   useEffect(() => {
     let result = [...mockEcommerceData];
     
-    if (filters.year !== "Tous") {
-      result = result.filter(item => item.year === parseInt(filters.year));
-    }
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== "Tous" && value !== undefined) {
+        result = result.filter(item => item[key as keyof typeof item] === value);
+      }
+    });
     
-    if (filters.month !== "Tous") {
-      result = result.filter(item => item.month === parseInt(filters.month));
-    }
-    
-    if (filters.product !== "Tous") {
-      result = result.filter(item => item.product === filters.product);
-    }
-    
-    if (filters.city !== "Tous") {
-      result = result.filter(item => item.city === filters.city);
-    }
-    
-    setFilteredData(result);
+    setData(result);
   }, [filters]);
-  
-  // Calculate KPI values
-  const totalVisits = 300000; // Simulated value
-  
-  const confirmedOrders = filteredData.filter(item => item.status === "Panier récupéré").length;
-  const abandonedCarts = filteredData.filter(item => item.status === "Abandonné").length;
+
+  // Handle chart click events
+  const handleDeviceClick = (device: string) => {
+    setFilters(prev => ({
+      ...prev,
+      deviceType: prev.deviceType === device ? undefined : device
+    }));
+  };
+
+  const handleClientTypeClick = (type: string) => {
+    setFilters(prev => ({
+      ...prev,
+      clientType: prev.clientType === type ? undefined : type
+    }));
+  };
+
+  const handleChannelClick = (channel: string) => {
+    setFilters(prev => ({
+      ...prev,
+      acquisitionChannel: prev.acquisitionChannel === channel ? undefined : channel
+    }));
+  };
+
+  // Calculate KPI values from filtered data
+  const totalVisits = 300000;
+  const confirmedOrders = data.filter(item => item.status === "Panier récupéré").length;
+  const abandonedCarts = data.filter(item => item.status === "Abandonné").length;
   const totalCarts = confirmedOrders + abandonedCarts;
   
   // 1. Conversion Rate
   const conversionRate = ((confirmedOrders / totalVisits) * 100).toFixed(1);
   
   // 2. Average Cart Value
-  const confirmedCartItems = filteredData.filter(item => item.status === "Panier récupéré");
+  const confirmedCartItems = data.filter(item => item.status === "Panier récupéré");
   const totalConfirmedValue = confirmedCartItems.reduce((sum, item) => sum + item.price, 0);
   const averageCartValue = confirmedOrders > 0 ? 
     (totalConfirmedValue / confirmedOrders).toFixed(0) : 0;
@@ -65,7 +84,7 @@ const Dashboard = () => {
     ((abandonedCarts / totalCarts) * 100).toFixed(1) : 0;
   
   // 4. Recovery Rate After Marketing Actions
-  const recoveredAfterMarketing = filteredData.filter(
+  const recoveredAfterMarketing = data.filter(
     item => item.status === "Panier récupéré" && 
     item.actions && 
     ["Relancé par email", "Retargeting pub", "Offre spéciale envoyée"].includes(item.actions)
@@ -75,7 +94,7 @@ const Dashboard = () => {
     ((recoveredAfterMarketing / abandonedCarts) * 100).toFixed(1) : 0;
   
   // 5. Sales Potential from Abandoned Carts
-  const abandonedItems = filteredData.filter(item => item.status === "Abandonné");
+  const abandonedItems = data.filter(item => item.status === "Abandonné");
   const totalAbandonedValue = abandonedItems.reduce((sum, item) => sum + item.price, 0);
   const salesPotential = abandonedCarts > 0 ? 
     (totalAbandonedValue).toFixed(0) : 0;
@@ -220,14 +239,14 @@ const Dashboard = () => {
           <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 hover:shadow-lg transition-shadow">
             <h3 className="text-lg font-medium mb-4 text-gray-800">Valeur des paniers abandonnés VS récupérés</h3>
             <CartsValueChart 
-              abandonedValue={totalAbandonedValue} 
-              recoveredValue={totalConfirmedValue} 
+              abandonedValue={data.filter(item => item.status === "Abandonné").reduce((sum, item) => sum + item.price, 0)} 
+              recoveredValue={data.filter(item => item.status === "Panier récupéré").reduce((sum, item) => sum + item.price, 0)} 
             />
           </div>
           
           <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 hover:shadow-lg transition-shadow">
             <h3 className="text-lg font-medium mb-4 text-gray-800">Taux d'abandon par type de client</h3>
-            <ClientTypeChart data={filteredData} />
+            <ClientTypeChart data={data} onClientTypeClick={handleClientTypeClick} />
           </div>
         </div>
 
@@ -235,24 +254,24 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
           <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 hover:shadow-lg transition-shadow">
             <h3 className="text-lg font-medium mb-4 text-gray-800">Évolution du taux d'abandon</h3>
-            <AbandonRateChart data={filteredData} />
+            <AbandonRateChart data={data} />
           </div>
           
           <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 hover:shadow-lg transition-shadow">
             <h3 className="text-lg font-medium mb-4 text-gray-800">Taux d'abandon par appareil</h3>
-            <DeviceAbandonChart data={filteredData} />
+            <DeviceAbandonChart data={data} onDeviceClick={handleDeviceClick} />
           </div>
           
           <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 hover:shadow-lg transition-shadow">
             <h3 className="text-lg font-medium mb-4 text-gray-800">Taux d'abandon par canal</h3>
-            <ChannelAbandonChart data={filteredData} />
+            <ChannelAbandonChart data={data} onChannelClick={handleChannelClick} />
           </div>
         </div>
 
         {/* Products Table */}
         <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 hover:shadow-lg transition-shadow">
           <h3 className="text-lg font-medium mb-4 text-gray-800">Tableau complet des produits</h3>
-          <ProductsTable data={filteredData} />
+          <ProductsTable data={data} />
         </div>
       </div>
     </div>

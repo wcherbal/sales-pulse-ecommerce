@@ -1,4 +1,3 @@
-
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -21,10 +20,10 @@ ChartJS.register(
 
 interface ChannelAbandonChartProps {
   data: any[];
+  onChannelClick?: (channel: string) => void;
 }
 
-const ChannelAbandonChart = ({ data }: ChannelAbandonChartProps) => {
-  // Group data by acquisition channel
+const ChannelAbandonChart = ({ data, onChannelClick }: ChannelAbandonChartProps) => {
   const calculateData = () => {
     const channels = ["Email", "SEO", "Publicité payante", "Accès direct", "Réseaux sociaux"];
     const channelData = [];
@@ -43,7 +42,6 @@ const ChannelAbandonChart = ({ data }: ChannelAbandonChartProps) => {
       });
     }
     
-    // Sort by abandonment rate (highest to lowest)
     channelData.sort((a, b) => b.rate - a.rate);
     
     return channelData;
@@ -107,6 +105,13 @@ const ChannelAbandonChart = ({ data }: ChannelAbandonChartProps) => {
             return label;
           }
         }
+      }
+    },
+    onClick: (event: any, elements: any[]) => {
+      if (elements.length > 0 && onChannelClick) {
+        const index = elements[0].index;
+        const channel = channelData[index].channel;
+        onChannelClick(channel);
       }
     }
   };
