@@ -1,4 +1,3 @@
-
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -59,13 +58,13 @@ const ChannelAbandonChart = ({ data, onChannelClick, activeChannel }: ChannelAba
         data: channelData.map(item => item.rate),
         backgroundColor: channelData.map(item => 
           item.channel === activeChannel 
-            ? 'rgba(139, 92, 246, 0.9)' 
-            : 'rgba(153, 102, 255, 0.6)'
+            ? '#D946EF' 
+            : '#8B5CF6'
         ),
         borderColor: channelData.map(item => 
           item.channel === activeChannel 
-            ? 'rgb(139, 92, 246)' 
-            : 'rgb(153, 102, 255)'
+            ? '#D946EF' 
+            : '#8B5CF6'
         ),
         borderWidth: 1
       }
@@ -115,7 +114,7 @@ const ChannelAbandonChart = ({ data, onChannelClick, activeChannel }: ChannelAba
   };
 
   return (
-    <div className="w-full h-56">
+    <div className="w-full h-48">
       <Bar data={chartData} options={options as any} />
     </div>
   );

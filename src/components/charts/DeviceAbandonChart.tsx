@@ -1,4 +1,3 @@
-
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -55,13 +54,13 @@ const DeviceAbandonChart = ({ data, onDeviceClick, activeDevice }: DeviceAbandon
         data: rates,
         backgroundColor: deviceTypes.map(device => 
           device === activeDevice 
-            ? 'rgba(139, 92, 246, 0.9)' 
-            : 'rgba(255, 159, 64, 0.6)'
+            ? '#D946EF' 
+            : '#F97316'
         ),
         borderColor: deviceTypes.map(device => 
           device === activeDevice 
-            ? 'rgb(139, 92, 246)' 
-            : 'rgb(255, 159, 64)'
+            ? '#D946EF' 
+            : '#F97316'
         ),
         borderWidth: 1
       }

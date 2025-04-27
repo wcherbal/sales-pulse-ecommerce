@@ -1,4 +1,3 @@
-
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -28,16 +27,13 @@ interface AbandonRateChartProps {
 }
 
 const AbandonRateChart = ({ data, onMonthClick, activeMonth }: AbandonRateChartProps) => {
-  // Group data by month and calculate abandonment rate
   const calculateMonthlyRates = () => {
     const monthlyData: Record<number, { abandoned: number, recovered: number }> = {};
     
-    // Initialize monthly data structure
     for (let i = 1; i <= 12; i++) {
       monthlyData[i] = { abandoned: 0, recovered: 0 };
     }
     
-    // Count abandoned and recovered carts by month
     data.forEach(item => {
       const month = item.month;
       if (item.status === "Abandonné") {
@@ -47,7 +43,6 @@ const AbandonRateChart = ({ data, onMonthClick, activeMonth }: AbandonRateChartP
       }
     });
     
-    // Calculate abandonment rate for each month
     const rates = [];
     const monthNames = [
       'Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin',
@@ -77,12 +72,12 @@ const AbandonRateChart = ({ data, onMonthClick, activeMonth }: AbandonRateChartP
       {
         label: "Taux d'abandon (%)",
         data: monthlyRates.map(item => item.rate),
-        borderColor: 'rgb(139, 92, 246)',
-        backgroundColor: 'rgba(139, 92, 246, 0.5)',
+        borderColor: '#8B5CF6',
+        backgroundColor: 'rgba(139, 92, 246, 0.1)',
         pointBackgroundColor: monthlyRates.map(item => 
           item.monthNumber === activeMonth 
-            ? 'rgb(234, 56, 76)' 
-            : 'rgb(139, 92, 246)'
+            ? '#FF1A75'
+            : '#8B5CF6'
         ),
         pointBorderColor: monthlyRates.map(item => 
           item.monthNumber === activeMonth 
@@ -154,7 +149,7 @@ const AbandonRateChart = ({ data, onMonthClick, activeMonth }: AbandonRateChartP
   };
 
   return (
-    <div className="w-full h-56">
+    <div className="w-full h-48">
       <Line data={chartData} options={options as any} />
     </div>
   );

@@ -1,4 +1,3 @@
-
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -26,12 +25,10 @@ interface ClientTypeChartProps {
 }
 
 const ClientTypeChart = ({ data, onClientTypeClick, activeClientType }: ClientTypeChartProps) => {
-  // Group data by client type
   const calculateData = () => {
     const newVisitors = data.filter(item => item.clientType === "Nouveau visiteur");
     const recurringClients = data.filter(item => item.clientType === "Client récurrent");
     
-    // Calculate abandonment rate for new visitors
     const newVisitorAbandoned = newVisitors.filter(item => item.status === "Abandonné").length;
     const newVisitorTotal = newVisitors.filter(item => 
       item.status === "Abandonné" || item.status === "Panier récupéré"
@@ -39,7 +36,6 @@ const ClientTypeChart = ({ data, onClientTypeClick, activeClientType }: ClientTy
     const newVisitorRate = newVisitorTotal > 0 ? 
       (newVisitorAbandoned / newVisitorTotal) * 100 : 0;
     
-    // Calculate abandonment rate for recurring clients
     const recurringAbandoned = recurringClients.filter(item => item.status === "Abandonné").length;
     const recurringTotal = recurringClients.filter(item => 
       item.status === "Abandonné" || item.status === "Panier récupéré"
@@ -61,13 +57,13 @@ const ClientTypeChart = ({ data, onClientTypeClick, activeClientType }: ClientTy
         data: rates,
         backgroundColor: clientTypes.map(type => 
           type === activeClientType 
-            ? 'rgba(139, 92, 246, 0.9)' 
-            : 'rgba(110, 64, 170, 0.6)'
+            ? '#8B5CF6' 
+            : '#0EA5E9'
         ),
         borderColor: clientTypes.map(type => 
           type === activeClientType 
-            ? 'rgb(139, 92, 246)' 
-            : 'rgb(110, 64, 170)'
+            ? '#8B5CF6' 
+            : '#0EA5E9'
         ),
         borderWidth: 1
       }
@@ -116,7 +112,7 @@ const ClientTypeChart = ({ data, onClientTypeClick, activeClientType }: ClientTy
   };
 
   return (
-    <div className="w-full h-56">
+    <div className="w-full h-48">
       <Bar data={chartData} options={options as any} />
     </div>
   );

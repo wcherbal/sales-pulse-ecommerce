@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Search, Bell } from "lucide-react";
 import KpiCard from "@/components/KpiCard";
@@ -11,6 +10,7 @@ import ChannelAbandonChart from "@/components/charts/ChannelAbandonChart";
 import ProductsTable from "@/components/ProductsTable";
 import { mockEcommerceData } from "@/data/mockData";
 import { toast } from "@/components/ui/use-toast";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface DynamicFilters {
   year: string;
@@ -34,11 +34,9 @@ const Dashboard = () => {
     city: "Tous"
   });
   
-  // Apply filters to data
   useEffect(() => {
     let result = [...mockEcommerceData];
     
-    // Filter by standard dropdown filters
     if (filters.year !== "Tous") {
       result = result.filter(item => item.year === filters.year);
     }
@@ -55,7 +53,6 @@ const Dashboard = () => {
       result = result.filter(item => item.city === filters.city);
     }
     
-    // Filter by interactive chart filters
     if (filters.deviceType) {
       result = result.filter(item => item.deviceType === filters.deviceType);
     }
@@ -89,7 +86,6 @@ const Dashboard = () => {
     setData(result);
   }, [filters]);
 
-  // Clear all interactive filters
   const clearInteractiveFilters = () => {
     setFilters(prev => ({
       ...prev,
@@ -108,7 +104,6 @@ const Dashboard = () => {
     });
   };
 
-  // Handle chart click events
   const handleDeviceClick = (device: string) => {
     setFilters(prev => ({
       ...prev,
@@ -210,26 +205,21 @@ const Dashboard = () => {
     }
   };
 
-  // Calculate KPI values from filtered data
   const totalVisits = 300000;
   const confirmedOrders = data.filter(item => item.status === "Panier récupéré").length;
   const abandonedCarts = data.filter(item => item.status === "Abandonné").length;
   const totalCarts = confirmedOrders + abandonedCarts;
   
-  // 1. Conversion Rate
   const conversionRate = ((confirmedOrders / totalVisits) * 100).toFixed(1);
   
-  // 2. Average Cart Value
   const confirmedCartItems = data.filter(item => item.status === "Panier récupéré");
   const totalConfirmedValue = confirmedCartItems.reduce((sum, item) => sum + item.price, 0);
   const averageCartValue = confirmedOrders > 0 ? 
     (totalConfirmedValue / confirmedOrders).toFixed(0) : 0;
   
-  // 3. Cart Abandonment Rate
   const abandonmentRate = totalCarts > 0 ? 
     ((abandonedCarts / totalCarts) * 100).toFixed(1) : 0;
   
-  // 4. Recovery Rate After Marketing Actions
   const recoveredAfterMarketing = data.filter(
     item => item.status === "Panier récupéré" && 
     item.actions && 
@@ -239,13 +229,11 @@ const Dashboard = () => {
   const recoveryRate = abandonedCarts > 0 ? 
     ((recoveredAfterMarketing / abandonedCarts) * 100).toFixed(1) : 0;
   
-  // 5. Sales Potential from Abandoned Carts
   const abandonedItems = data.filter(item => item.status === "Abandonné");
   const totalAbandonedValue = abandonedItems.reduce((sum, item) => sum + item.price, 0);
   const salesPotential = abandonedItems.length > 0 ? 
     (totalAbandonedValue).toFixed(0) : 0;
 
-  // Filter options
   const yearOptions = ["Tous", ...new Set(mockEcommerceData.map(item => item.year))].sort();
   const monthOptions = ["Tous", ...Array.from({length: 12}, (_, i) => i + 1)];
   const productOptions = ["Tous", ...new Set(mockEcommerceData.map(item => item.product))];
@@ -254,14 +242,12 @@ const Dashboard = () => {
   return (
     <div className="flex-1 overflow-y-auto bg-gray-50">
       <div className="p-4 lg:p-6">
-        {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-xl lg:text-2xl font-semibold text-gray-800">
               Optimisation des ventes - Conversion & abandon de panier
             </h1>
             
-            {/* Active filters indicators */}
             {(filters.deviceType || filters.clientType || filters.acquisitionChannel || filters.status || filters.funnelStage || filters.selectedMonth) && (
               <div className="mt-2 flex flex-wrap gap-2">
                 {filters.deviceType && (
@@ -319,7 +305,6 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Filters */}
         <div className="flex flex-wrap gap-3 mb-6">
           <select 
             className="border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-violet-400 bg-white hover:border-violet-300 transition-colors"
@@ -368,7 +353,6 @@ const Dashboard = () => {
           </select>
         </div>
 
-        {/* KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
           <KpiCard 
             icon="%"
@@ -416,7 +400,6 @@ const Dashboard = () => {
           />
         </div>
 
-        {/* Charts - Row 1 */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
           <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 hover:shadow-lg transition-shadow">
             <h3 className="text-lg font-medium mb-4 text-gray-800">Taux de conversion à chaque étape</h3>
@@ -449,7 +432,6 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Charts - Row 2 */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
           <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 hover:shadow-lg transition-shadow">
             <h3 className="text-lg font-medium mb-4 text-gray-800">Évolution du taux d'abandon</h3>
@@ -479,10 +461,11 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Products Table */}
         <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 hover:shadow-lg transition-shadow">
           <h3 className="text-lg font-medium mb-4 text-gray-800">Tableau complet des produits</h3>
-          <ProductsTable data={data} />
+          <ScrollArea className="h-[400px]">
+            <ProductsTable data={data} />
+          </ScrollArea>
         </div>
       </div>
     </div>

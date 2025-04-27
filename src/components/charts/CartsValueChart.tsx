@@ -36,12 +36,12 @@ const CartsValueChart = ({ abandonedValue, recoveredValue, onStatusClick, active
         label: 'Valeur (€)',
         data: [abandonedValue, recoveredValue],
         backgroundColor: [
-          activeStatus === 'Abandonné' ? 'rgba(234, 56, 76, 0.9)' : 'rgba(255, 99, 132, 0.6)',
-          activeStatus === 'Panier récupéré' ? 'rgba(75, 250, 192, 0.9)' : 'rgba(75, 192, 192, 0.6)'
+          activeStatus === 'Abandonné' ? '#FF1A75' : '#FF4D94',
+          activeStatus === 'Panier récupéré' ? '#00E5B7' : '#00FFB3'
         ],
         borderColor: [
-          activeStatus === 'Abandonné' ? 'rgb(234, 56, 76)' : 'rgb(255, 99, 132)',
-          activeStatus === 'Panier récupéré' ? 'rgb(75, 250, 192)' : 'rgb(75, 192, 192)'
+          activeStatus === 'Abandonné' ? '#FF1A75' : '#FF4D94',
+          activeStatus === 'Panier récupéré' ? '#00E5B7' : '#00FFB3'
         ],
         borderWidth: 1,
       },
@@ -89,7 +89,7 @@ const CartsValueChart = ({ abandonedValue, recoveredValue, onStatusClick, active
   };
 
   return (
-    <div className="w-full h-56">
+    <div className="w-full h-48">
       <Bar data={data} options={options as any} />
     </div>
   );
